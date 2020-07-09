@@ -15,6 +15,12 @@ KB.on('dom.ready', function() {
             }
         });
 
+        // remove resize handles for the moment
+        /*var handles = document.querySelectorAll("#gantt-chart .handle-group");
+        for (var i = 0; i < handles.length; i++) {
+            handles[i].remove();
+        }*/
+
         console.log("gantt chart loaded");
 
         KB.onClick('#gantt-mode-day', function(e) {
