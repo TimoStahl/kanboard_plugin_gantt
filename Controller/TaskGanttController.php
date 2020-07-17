@@ -36,4 +36,36 @@ class TaskGanttController extends BaseController
             'tasks' => $filter->format($this->taskGanttFormatter),
         ]));
     }
+
+    /**
+     * Save new task start date and due date
+     */
+    public function save()
+    {
+        $this->getProject();
+        $changes = $this->request->getJson();
+        $values = [];
+
+        if (! empty($changes['start'])) {
+            $values['date_started'] = strtotime($changes['start']);
+        }
+
+        if (! empty($changes['end'])) {
+            $values['date_due'] = strtotime($changes['end']);
+        }
+
+        if (! empty($values)) {
+            $values['id'] = $changes['id'];
+            print_r($values);
+            $result = $this->taskModificationModel->update($values);
+
+            if (! $result) {
+                $this->response->json(array('message' => 'Unable to save task'), 400);
+            } else {
+                $this->response->json(array('message' => 'OK'), 201);
+            }
+        } else {
+            $this->response->json(array('message' => 'Ignored'), 200);
+        }
+    }
 }

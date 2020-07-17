@@ -12,6 +12,29 @@ KB.on('dom.ready', function() {
             language: jQuery("html").attr('lang'),
             on_click: function(task) {
                 console.log(task);
+            },
+            on_date_change: function(task, start, end) {
+
+                console.log(task, start, end);
+
+                //get save url
+                var sUrl = jQuery("#gantt-chart").data("save-url");
+
+                var oValues = {
+                    id: task.id,
+                    start: start,
+                    end: end
+                };
+
+                $.ajax({
+                    cache: false,
+                    url: sUrl,
+                    contentType: "application/json",
+                    type: "POST",
+                    processData: false,
+                    data: JSON.stringify(oValues)
+                });
+
             }
         });
 
