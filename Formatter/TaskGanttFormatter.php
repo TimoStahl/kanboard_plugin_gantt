@@ -28,6 +28,14 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $bars[] = $this->formatTask($task);
         }
 
+        array_multisort(
+            array_column($bars, 'start'),
+            SORT_ASC,
+            array_column($bars, 'end'),
+            SORT_ASC,
+            $bars
+        );
+
         return $bars;
     }
 
@@ -42,16 +50,40 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $this->columns[$task['project_id']] = $this->columnModel->getList($task['project_id']);
         }
 
-        $start = $task['date_started'] ?: time();
-        $end = $task['date_due'] ?: $start;
+        // calculate some days
+        // Start ❌ Duration ✔ End ❌
+        if (!$task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
+            $start = time();
+            $secondsToAdd = $task['time_estimated'] * (60 * 60);
+            $end = $start + $secondsToAdd;
+        // Start ✔ Duration ✔ End ❌
+        } elseif ($task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
+            $start = $task['date_started'];
+            $secondsToAdd = $task['time_estimated'] * (60 * 60);
+            $end = $start + $secondsToAdd;
+        // Start ❌ Duration ✔ End  ✔
+        } elseif (!$task['date_started'] && $task['time_estimated'] && $task['date_due']) {
+            $end = $task['date_due'];
+            $secondsToSub = $task['time_estimated'] * (60 * 60);
+            $start = $end - $secondsToSub;
+        // Start ❌ Duration ❌ End ❌
+        // Start ✔ Duration ✔ End ✔
+        // Start ✔ Duration ❌ End ❌
+        // Start ✔ Duration ❌ End ✔
+        // Start ❌ Duration ❌ End  ✔
+        } else {
+            $start = $task['date_started'] ?: time();
+            $end = $task['date_due'] ?: $start;
+        }
+        // TODO: use links to calculate dates, e.g. blocked
 
+        // Task connections
         $tasklinks = '';
 
         foreach ($this->taskLinkModel->getAllGroupedByLabel($task['id']) as $type => $links) {
             foreach ($links as $link) {
-
                 // check if link already exists to avoid arrows in both direction
-                // TODO should be improved to point the arrows in the right direction                
+                // TODO should be improved to point the arrows in the right direction
                 if (!array_key_exists($task['id'], $this->links)) {
                     $this->links[$task['id']] = [];
                 }
