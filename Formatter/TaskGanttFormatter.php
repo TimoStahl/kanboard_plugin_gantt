@@ -80,20 +80,14 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         // Task connections
         $tasklinks = '';
 
+        $link_settings = $this->linkModel->getAll();
+
         foreach ($this->taskLinkModel->getAllGroupedByLabel($task['id']) as $type => $links) {
-            foreach ($links as $link) {
-                // check if link already exists to avoid arrows in both direction
-                // TODO should be improved to point the arrows in the right direction
-                if (!array_key_exists($task['id'], $this->links)) {
-                    $this->links[$task['id']] = [];
-                }
-                if (!array_key_exists($link['task_id'], $this->links)) {
-                    $this->links[$link['task_id']] = [];
-                }
+            $settings_key = array_search($type, array_column($link_settings, 'label'));
+            $type_visible = $link_settings[$settings_key]['gantt_visible'];
 
-                if (!in_array($task['id'], $this->links[$link['task_id']])) {
-                    array_push($this->links[$task['id']], $link['task_id']);
-
+            if ($type_visible) {
+                foreach ($links as $link) {
                     $tasklinks = $tasklinks.', '.$link['task_id'];
                 }
             }

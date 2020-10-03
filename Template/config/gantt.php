@@ -6,7 +6,7 @@
     <table class="table-striped table-scrolling">
         <tr>
             <th><?php echo t('Link labels'); ?></th>
-            <th><?php echo t('Gantt direction'); ?></th>
+            <th><?php echo t('Gantt visibility'); ?></th>
             <th><?php echo t('Actions'); ?></th>
         </tr>
         <?php foreach ($links as $link) { ?>
@@ -15,11 +15,11 @@
                 <strong><?php echo t($link['label']); ?></strong>
             </td>
             <td>
-                <?php echo t($link['gantt_direction']); ?>
+                <?php echo $link['gantt_visible'] ? t('visible') : t('hidden'); ?>
             </td>
             <td>
                 <ul>
-                <?php echo $this->url->link(t('change direction'), 'ConfigController', 'change_direction', ['plugin' => 'gantt', 'link_id' => $link['id']]); ?>
+                <?php echo $this->url->link(t('change visibility'), 'ConfigController', 'change_visibility', ['plugin' => 'gantt', 'link_id' => $link['id']]); ?>
                 </ul>
             </td>
         </tr>

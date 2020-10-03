@@ -8,5 +8,5 @@ const VERSION = 1;
 
 function version_1(PDO $pdo)
 {
-    $pdo->exec("ALTER TABLE links ADD COLUMN gantt_direction INTEGER DEFAULT '0'");
+    $pdo->exec("ALTER TABLE links ADD COLUMN gantt_visible INTEGER DEFAULT '0'");
 }

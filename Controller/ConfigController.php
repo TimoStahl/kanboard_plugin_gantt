@@ -22,47 +22,34 @@ class ConfigController extends \Kanboard\Controller\ConfigController
         );
     }
 
-    public function change_direction()
+    public function change_visibility()
     {
         $link_id = $this->request->getIntegerParam('link_id');
 
         $link = $this->linkModel->getById($link_id);
 
-        $gantt_direction = !$link['gantt_direction'] ? 1 : 0;
+        $gantt_visible = !$link['gantt_visible'] ? 1 : 0;
 
-        if ($this->updateLinkDirection($link['id'], $gantt_direction)) {
-            $this->flash->success(t('Direction changed.'));
+        if ($this->updateLinkVisibility($link['id'], $gantt_visible)) {
+            $this->flash->success(t('Visibility changed.'));
         } else {
-            $this->flash->failure(t('Direction not changed.'));
+            $this->flash->failure(t('Visibility not changed.'));
         }
 
         $this->response->redirect($this->helper->url->to('ConfigController', 'show', ['plugin' => 'Gantt']), true);
     }
 
-    public function updateLinkDirection($id, $direction)
+    public function updateLinkVisibility($id, $visible)
     {
+        // should be moved to model
         return $this->db
             ->table(LinkModel::TABLE)
             ->eq('id', $id)
             ->update(
                 [
-                    'gantt_direction' => $direction,
+                    'gantt_visible' => $visible,
                 ]
             )
         ;
-    }
-
-    public function save()
-    {
-        $values = $this->request->getValues();
-        $values += ['calendar_user_subtasks_time_tracking' => 0];
-
-        if ($this->configModel->save($values)) {
-            $this->flash->success(t('Settings saved successfully.'));
-        } else {
-            $this->flash->failure(t('Unable to save your settings.'));
-        }
-
-        $this->response->redirect($this->helper->url->to('ConfigController', 'show', ['plugin' => 'Gantt']));
     }
 }
