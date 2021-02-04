@@ -100,6 +100,10 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             'end' => date('Y-m-d', $end),
             'progress' => $this->taskModel->getProgress($task, $this->columns[$task['project_id']]),
             'dependencies' => $tasklinks,
+            'url' => $this->helper->url->to('TaskViewController', 'show', ['task_id' => $task['id'], 'project_id' => $task['project_id']], '', true),
+            'column' => $task['column_name'],
+            'swimlane' => $task['swimlane_name'],
+            'category' => $task['category_name'],
         ];
     }
 }

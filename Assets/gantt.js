@@ -1,64 +1,106 @@
-KB.on('dom.ready', function() {
-    if (KB.exists('#gantt-chart')) {
+KB.on("dom.ready", function () {
+  if (KB.exists("#gantt-chart")) {
+    console.log("load gantt chart");
 
-        console.log("load gantt chart");
+    var tasks = jQuery("#gantt-chart").data("records");
+    var gantt = new Gantt("#gantt-chart", tasks, {
+      view_modes: ["Day", "Week", "Month"],
+      view_mode: "Week",
+      date_format: "YYYY-MM-DD",
+      custom_popup_html: function (task) {
+        function format_date(oDate) {
+          if (oDate.getHours() === 0 && oDate.getMinutes() === 0) {
+            return oDate.toLocaleDateString();
+          } else {
+            return oDate.toLocaleString();
+          }
+        }
+        const start_date = format_date(task._start);
+        const end_date = format_date(task._end);
+        // TODO: add more info and translate text
+        return `
+                <div class="details-container">
+                    <a href="${task.url}">
+                        <b>#${task.id} ${task.name}</b>
+                    </a>
+                    <table>
+                        <tr>
+                            <td>Start</td>
+                            <td>${start_date}</td>
+                        </tr>
+                        <tr>
+                            <td>End</td>
+                            <td>${end_date}</td>
+                        </tr>
+                        <tr>
+                            <td>Progress</td>
+                            <td>${task.progress}%</td>
+                        </tr>
+                        <tr>
+                            <td>Column</td>
+                            <td>${task.column}</td>
+                        </tr>
+                        <tr>
+                            <td>Swimlane</td>
+                            <td>${task.swimlane}</td>
+                        </tr>
+                        <tr>
+                            <td>Category</td>
+                            <td>${task.category}</td>
+                        </tr>
+                    </table>
+                </div>
+                `;
+      },
+      language: jQuery("html").attr("lang"),
+      on_click: function (task) {
+        //console.log(task);
+        window.open(task.url);
+      },
+      on_date_change: function (task, start, end) {
+        console.log(task, start, end);
 
-        var tasks = jQuery("#gantt-chart").data("records");
-        var gantt = new Gantt("#gantt-chart", tasks, {
-            view_modes: ['Day', 'Week', 'Month'],
-            view_mode: 'Week',
-            date_format: 'YYYY-MM-DD',
-            custom_popup_html: null, //TODO
-            language: jQuery("html").attr('lang'),
-            on_click: function(task) {
-                console.log(task);
-            },
-            on_date_change: function(task, start, end) {
+        //get save url
+        var sUrl = jQuery("#gantt-chart").data("save-url");
 
-                console.log(task, start, end);
+        var oValues = {
+          id: task.id,
+          start: start,
+          end: end,
+        };
 
-                //get save url
-                var sUrl = jQuery("#gantt-chart").data("save-url");
-
-                var oValues = {
-                    id: task.id,
-                    start: start,
-                    end: end
-                };
-
-                $.ajax({
-                    cache: false,
-                    url: sUrl,
-                    contentType: "application/json",
-                    type: "POST",
-                    processData: false,
-                    data: JSON.stringify(oValues)
-                });
-
-            }
+        $.ajax({
+          cache: false,
+          url: sUrl,
+          contentType: "application/json",
+          type: "POST",
+          processData: false,
+          data: JSON.stringify(oValues),
         });
+      },
+    });
 
-        // remove resize handles for the moment
-        /*var handles = document.querySelectorAll("#gantt-chart .handle-group");
+    // remove resize handles for the moment
+    /*var handles = document.querySelectorAll("#gantt-chart .handle-group");
         for (var i = 0; i < handles.length; i++) {
             handles[i].remove();
         }*/
 
-        console.log("gantt chart loaded");
+    console.log("gantt chart loaded");
 
-        KB.onClick('#gantt-mode-day', function(e) {
-            console.log("mode day clicked");
-            gantt.change_view_mode('Day');
-        });
+    KB.onClick("#gantt-mode-day", function (e) {
+      //console.log("mode day clicked");
+      gantt.change_view_mode("Day");
+    });
 
-        KB.onClick('#gantt-mode-week', function(e) {
-            console.log("mode week clicked");
-            gantt.change_view_mode('Week');
-        });
+    KB.onClick("#gantt-mode-week", function (e) {
+      //console.log("mode week clicked");
+      gantt.change_view_mode("Week");
+    });
 
-        KB.onClick('#gantt-mode-month', function(e) {
-            console.log("mode month clicked");
-            gantt.change_view_mode('Month');
-        });
-    }
+    KB.onClick("#gantt-mode-month", function (e) {
+      //console.log("mode month clicked");
+      gantt.change_view_mode("Month");
+    });
+  }
 });
