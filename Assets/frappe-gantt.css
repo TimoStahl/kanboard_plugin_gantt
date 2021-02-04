@@ -183,3 +183,6 @@
 .details-container table {
   margin: 0;
 }
+.gantt > .active {
+  background-color: lightgrey;
+}

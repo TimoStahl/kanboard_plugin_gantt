@@ -88,19 +88,25 @@ KB.on("dom.ready", function () {
 
     console.log("gantt chart loaded");
 
-    KB.onClick("#gantt-mode-day", function (e) {
-      //console.log("mode day clicked");
+    KB.onClick("#gantt-mode-day", function (element) {
       gantt.change_view_mode("Day");
+      KB.find("#gantt-mode-week").removeClass("active");
+      KB.find("#gantt-mode-month").removeClass("active");
+      KB.dom(element.srcElement).addClass("active");
     });
 
-    KB.onClick("#gantt-mode-week", function (e) {
-      //console.log("mode week clicked");
+    KB.onClick("#gantt-mode-week", function (element) {
       gantt.change_view_mode("Week");
+      KB.find("#gantt-mode-month").removeClass("active");
+      KB.find("#gantt-mode-day").removeClass("active");
+      KB.dom(element.srcElement).addClass("active");
     });
 
-    KB.onClick("#gantt-mode-month", function (e) {
-      //console.log("mode month clicked");
+    KB.onClick("#gantt-mode-month", function (element) {
       gantt.change_view_mode("Month");
+      KB.find("#gantt-mode-week").removeClass("active");
+      KB.find("#gantt-mode-day").removeClass("active");
+      KB.dom(element.srcElement).addClass("active");
     });
   }
 });

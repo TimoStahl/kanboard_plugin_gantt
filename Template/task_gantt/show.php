@@ -2,11 +2,11 @@
     <?php echo $this->projectHeader->render($project, 'TaskGanttController', 'show', false, 'Gantt'); ?>
     <div class="table-list-header">
         <?php echo t('Gantt settings:'); ?>     
-        <ul class="views">
+        <ul class="gantt views">
             <li id="gantt-mode-day">
                 <?php echo t('Day'); ?>
             </li>
-            <li id="gantt-mode-week">
+            <li id="gantt-mode-week" class="active">
                 <?php echo t('Week'); ?>
             </li>
             <li id="gantt-mode-month">
