@@ -23,9 +23,15 @@ KB.on("dom.ready", function () {
                 var matches = html.match(/\$\{([\w-_\.]*)\}/g);
                 if (matches) {
                     jQuery.each(matches, function (i, taskValue) {
-                        // TODO: if eval == null => hide current tr or td
                         var _taskValue = eval(taskValue.slice(2, -1));
-                        html = html.replace(taskValue, _taskValue ? _taskValue : '-');
+                        if (_taskValue) {
+                            html = html.replace(taskValue, _taskValue ? _taskValue : '-');
+                        } else {
+                            var $div = jQuery('<div/>');
+                            $div.append(html);
+                            jQuery('td:contains("' + taskValue + '")', jQuery($div)).parent().remove();
+                            html = $div.html();
+                        }
                     });
                 }
                 return html;
