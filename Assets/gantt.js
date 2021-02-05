@@ -29,7 +29,7 @@ KB.on("dom.ready", function () {
                         } else {
                             var $div = jQuery('<div/>');
                             $div.append(html);
-                            jQuery('td:contains("' + taskValue + '")', jQuery($div)).parent().remove();
+                            ($el = jQuery('td:contains("' + taskValue + '")', jQuery($div))) && $el.parent() && $el.parent().remove();
                             html = $div.html();
                         }
                     });
