@@ -50,27 +50,29 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $this->columns[$task['project_id']] = $this->columnModel->getList($task['project_id']);
         }
 
+        //die('<pre>' . print_r($task, 1) . '</pre>');
+
         // calculate some days
         // Start ❌ Duration ✔ End ❌
         if (!$task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
             $start = time();
             $secondsToAdd = $task['time_estimated'] * (60 * 60);
             $end = $start + $secondsToAdd;
-        // Start ✔ Duration ✔ End ❌
+            // Start ✔ Duration ✔ End ❌
         } elseif ($task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
             $start = $task['date_started'];
             $secondsToAdd = $task['time_estimated'] * (60 * 60);
             $end = $start + $secondsToAdd;
-        // Start ❌ Duration ✔ End  ✔
+            // Start ❌ Duration ✔ End  ✔
         } elseif (!$task['date_started'] && $task['time_estimated'] && $task['date_due']) {
             $end = $task['date_due'];
             $secondsToSub = $task['time_estimated'] * (60 * 60);
             $start = $end - $secondsToSub;
-        // Start ❌ Duration ❌ End ❌
-        // Start ✔ Duration ✔ End ✔
-        // Start ✔ Duration ❌ End ❌
-        // Start ✔ Duration ❌ End ✔
-        // Start ❌ Duration ❌ End  ✔
+            // Start ❌ Duration ❌ End ❌
+            // Start ✔ Duration ✔ End ✔
+            // Start ✔ Duration ❌ End ❌
+            // Start ✔ Duration ❌ End ✔
+            // Start ❌ Duration ❌ End  ✔
         } else {
             $start = $task['date_started'] ?: time();
             $end = $task['date_due'] ?: $start;
@@ -88,7 +90,7 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
 
             if ($type_visible) {
                 foreach ($links as $link) {
-                    $tasklinks = $tasklinks.', '.$link['task_id'];
+                    $tasklinks = $tasklinks . ', ' . $link['task_id'];
                 }
             }
         }
@@ -104,6 +106,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             'column' => $task['column_name'],
             'swimlane' => $task['swimlane_name'],
             'category' => $task['category_name'],
+            'custom_class' => 'bar-color-' . $task['color_id'],
+            'column_id' => $task['column_id'],
         ];
     }
 }
