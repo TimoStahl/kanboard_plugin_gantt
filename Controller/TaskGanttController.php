@@ -17,8 +17,6 @@ class TaskGanttController extends BaseController
         $search = $this->helper->projectHeader->getSearchQuery($project);
         $filter = $this->taskLexer->build($search)->withFilter(new TaskProjectFilter($project['id']));
 
-        //die('<pre>' . print_r($filter->format($this->taskGanttFormatter), 1) . '</pre>');
-
         $this->response->html($this->helper->layout->app('Gantt:task_gantt/show', [
             'project' => $project,
             'title' => $project['name'],
