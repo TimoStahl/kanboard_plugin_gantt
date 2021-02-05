@@ -50,8 +50,6 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $this->columns[$task['project_id']] = $this->columnModel->getList($task['project_id']);
         }
 
-        //die('<pre>' . print_r($task, 1) . '</pre>');
-
         // calculate some days
         // Start ❌ Duration ✔ End ❌
         if (!$task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
