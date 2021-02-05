@@ -18,8 +18,11 @@
         </ul>
     </div>
     <?php if (!empty($tasks)) { ?>
-        <div id="gantt-chart" data-save-url="<?php echo $this->url->href('TaskGanttController', 'save', ['project_id' => $project['id'], 'plugin' => 'Gantt']); ?>" data-records='<?php echo json_encode($tasks); ?>'></div>
-        <div id="gantt-popup-template" class="hissde">
+        <div id="gantt-chart"
+             data-save-url="<?php echo $this->url->href('TaskGanttController', 'save', ['project_id' => $project['id'], 'plugin' => 'Gantt']); ?>"
+             data-records='<?php echo json_encode($tasks); ?>'
+        ></div>
+        <div id="gantt-popup-template" class="hide">
             <?= $this->render('Gantt:task_gantt/popup', array('project_id' => $project['id'], 'tasks' => $tasks)) ?>
         </div>
     <?php } else { ?>
