@@ -20,3 +20,46 @@ or
 
 - Create a folder **plugins/Gantt**
 - Copy all files under this directory
+
+## Hooks
+
+### Popup
+You can add more rows in task popup with your custom plugin.
+First, enable the Formatter hook with your custom method in your own Plugin.php :
+```php
+<?php
+
+$this->hook->on('formatter:gantt:format:task', array($this, 'testGantt'));
+```
+Method example :
+```php
+<?php
+
+/**
+ * $data = array(
+ *     'templateTask' => array, // contains data that will be send to popup
+ *     'task' => array, // contains all data about task
+ * )
+ */
+public function testGantt(array &$data)
+{
+    $data['templateTask']['assignee_name'] = $data['task']['assignee_name'];
+}
+```
+
+Last thing, attach a hook to the render template :
+```php
+<?php
+
+// Add a row at the top of the table
+$this->template->hook->attach('template:gantt:task:popup:beginning-table', 'YouPlugin:you/template');
+// Add a row at the bottom of the table
+$this->template->hook->attach('template:gantt:task:popup:and-table', 'YouPlugin:you/template');
+```
+Template example (please, keep the ```${}``` format) :
+```php
+<tr>
+    <td><?= t('Assignee') ?></td>
+    <td>${task.assignee_name}</td>
+</tr>
+```
