@@ -16,16 +16,18 @@ KB.on("dom.ready", function () {
                         return oDate.toLocaleString();
                     }
                 }
-                const start_date = format_date(task._start);
-                const end_date = format_date(task._end);
+                task.start_date = format_date(task._start);
+                task.end_date = format_date(task._end);
                 // TODO: add more info and translate text
                 var html = jQuery('#gantt-popup-template').html();
                 var matches = html.match(/\$\{([\w-_\.]*)\}/g);
                 if (matches) {
                     jQuery.each(matches, function (i, taskValue) {
-                        var _taskValue = eval(taskValue.slice(2, -1));
-                        if (_taskValue) {
-                            html = html.replace(taskValue, _taskValue ? _taskValue : '-');
+                        var _taskValue = taskValue.slice(2, -1).split('.');
+                        if (_taskValue.length > 1 && task.hasOwnProperty(_taskValue[1])) {
+                            html = html.replace(taskValue, task[_taskValue[1]]);
+                        } else if (_taskValue.length == 1 && task.hasOwnProperty(_taskValue[0])) {
+                            html = html.replace(taskValue, task[_taskValue[0]]);
                         } else {
                             var $div = jQuery('<div/>');
                             $div.append(html);
