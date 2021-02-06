@@ -2,11 +2,19 @@ KB.on("dom.ready", function () {
     if (KB.exists("#gantt-chart")) {
         console.log("load gantt chart");
 
+        var default_view_mode = "Week",
+            allowed_view_modes = ["Day", "Week", "Month"];
+
+        if (($ls = localStorage.getItem("gantt_view_mode")) && jQuery.inArray($ls, allowed_view_modes) > -1) {
+            default_view_mode = $ls;
+            jQuery("ul.gantt li").removeClass('active');
+            jQuery("#gantt-mode-" + $ls.toLowerCase()).addClass('active');
+        }
+
         var tasks = jQuery("#gantt-chart").data("records");
-        console.log(tasks);
         var gantt = new Gantt("#gantt-chart", initGanttTasks(tasks), {
-            view_modes: ["Day", "Week", "Month"],
-            view_mode: "Week",
+            view_modes: allowed_view_modes,
+            view_mode: default_view_mode,
             date_format: "YYYY-MM-DD",
             custom_popup_html: function (task) {
                 function format_date(oDate) {
@@ -92,6 +100,7 @@ KB.on("dom.ready", function () {
 
         KB.onClick("#gantt-mode-day", function (element) {
             gantt.change_view_mode("Day");
+            localStorage.setItem("gantt_view_mode", "Day");
             KB.find("#gantt-mode-week").removeClass("active");
             KB.find("#gantt-mode-month").removeClass("active");
             KB.dom(element.srcElement).addClass("active");
@@ -99,6 +108,7 @@ KB.on("dom.ready", function () {
 
         KB.onClick("#gantt-mode-week", function (element) {
             gantt.change_view_mode("Week");
+            localStorage.setItem("gantt_view_mode", "Week");
             KB.find("#gantt-mode-month").removeClass("active");
             KB.find("#gantt-mode-day").removeClass("active");
             KB.dom(element.srcElement).addClass("active");
@@ -106,6 +116,7 @@ KB.on("dom.ready", function () {
 
         KB.onClick("#gantt-mode-month", function (element) {
             gantt.change_view_mode("Month");
+            localStorage.setItem("gantt_view_mode", "Month");
             KB.find("#gantt-mode-week").removeClass("active");
             KB.find("#gantt-mode-day").removeClass("active");
             KB.dom(element.srcElement).addClass("active");
