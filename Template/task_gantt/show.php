@@ -23,7 +23,7 @@
              data-records='<?php echo json_encode($tasks); ?>'
         ></div>
         <div id="gantt-popup-template" class="hide">
-            <?= $this->render('Gantt:task_gantt/popup', array('project_id' => $project['id'], 'tasks' => $tasks)) ?>
+            <?= $this->render('Gantt:task_gantt/popup', array('project' => $project, 'tasks' => $tasks)) ?>
         </div>
     <?php } else { ?>
         <p class="alert"><?php echo t('There is no task in your project.'); ?></p>
