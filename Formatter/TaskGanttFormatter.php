@@ -93,7 +93,7 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             }
         }
 
-        return [
+        $templateTask = [
             'id' => $task['id'],
             'name' => $task['title'],
             'start' => date('Y-m-d', $start),
@@ -107,5 +107,22 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             'custom_class' => 'bar-color-' . $task['color_id'],
             'column_id' => $task['column_id'],
         ];
+
+        // we have to create an array because hook::reference allow only 1 argument
+        $reference = array('templateTask' => $templateTask, 'task' => $task);
+        $this->hook->reference('formatter:gantt:format:task', $reference);
+        /**
+         * Exemple to use hook in plugin :
+         *     // Enable hook with custom method 
+         *     // (don't forget to use the hook template "template:gantt:task:popup:end-table" to add a <tr/> element in popup !)
+         *     $this->hook->on('formatter:gantt:format:task', array($this, 'testGantt'));
+         *     // Create this method
+         *     public function testGantt(array &$data)
+         *     {
+         *         $data['templateTask']['assignee_name'] = $data['task']['assignee_name'];
+         *     }
+         */
+
+        return $reference['templateTask'];
     }
 }
