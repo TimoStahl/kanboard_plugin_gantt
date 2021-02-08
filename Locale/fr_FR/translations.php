@@ -7,4 +7,5 @@ return [
     'Day' => 'Jour',
     'Week' => 'Semaine',
     'Month' => 'Mois',
+    'Year' => 'Année',
 ];

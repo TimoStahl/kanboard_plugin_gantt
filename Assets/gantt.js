@@ -3,12 +3,12 @@ KB.on("dom.ready", function () {
         console.log("load gantt chart");
 
         var default_view_mode = "Week",
-            allowed_view_modes = ["Day", "Week", "Month"];
+            allowed_view_modes = ["Day", "Week", "Month", "Year"];
 
         if (($ls = localStorage.getItem("gantt_view_mode")) && jQuery.inArray($ls, allowed_view_modes) > -1) {
             default_view_mode = $ls;
-            jQuery("ul.gantt li").removeClass('active');
-            jQuery("#gantt-mode-" + $ls.toLowerCase()).addClass('active');
+            jQuery('ul.gantt li').removeClass('active');
+            jQuery('.gantt-change-mode[data-mode-view="' + default_view_mode + '"]').addClass('active');
         }
 
         var tasks = jQuery("#gantt-chart").data("records");
@@ -98,28 +98,14 @@ KB.on("dom.ready", function () {
 
         console.log("gantt chart loaded");
 
-        KB.onClick("#gantt-mode-day", function (element) {
-            gantt.change_view_mode("Day");
-            localStorage.setItem("gantt_view_mode", "Day");
-            KB.find("#gantt-mode-week").removeClass("active");
-            KB.find("#gantt-mode-month").removeClass("active");
-            KB.dom(element.srcElement).addClass("active");
-        });
-
-        KB.onClick("#gantt-mode-week", function (element) {
-            gantt.change_view_mode("Week");
-            localStorage.setItem("gantt_view_mode", "Week");
-            KB.find("#gantt-mode-month").removeClass("active");
-            KB.find("#gantt-mode-day").removeClass("active");
-            KB.dom(element.srcElement).addClass("active");
-        });
-
-        KB.onClick("#gantt-mode-month", function (element) {
-            gantt.change_view_mode("Month");
-            localStorage.setItem("gantt_view_mode", "Month");
-            KB.find("#gantt-mode-week").removeClass("active");
-            KB.find("#gantt-mode-day").removeClass("active");
-            KB.dom(element.srcElement).addClass("active");
+        KB.onClick(".gantt-change-mode", function (element) {
+            var mode = jQuery(element.srcElement).data('modeView');
+            if (mode && jQuery.inArray(mode, allowed_view_modes) > -1) {
+                gantt.change_view_mode(mode);
+                localStorage.setItem("gantt_view_mode", mode);
+                jQuery(".gantt-change-mode").removeClass("active");
+                KB.dom(element.srcElement).addClass("active");
+            }
         });
     }
 });

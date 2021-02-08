@@ -3,14 +3,17 @@
     <div class="table-list-header">
         <?php echo t('Gantt settings:'); ?>
         <ul class="gantt views">
-            <li id="gantt-mode-day">
+            <li class="gantt-change-mode" data-mode-view="Day">
                 <?php echo t('Day'); ?>
             </li>
-            <li id="gantt-mode-week" class="active">
+            <li class="gantt-change-mode" data-mode-view="Week">
                 <?php echo t('Week'); ?>
             </li>
-            <li id="gantt-mode-month">
+            <li class="gantt-change-mode" data-mode-view="Month">
                 <?php echo t('Month'); ?>
+            </li>
+            <li class="gantt-change-mode" data-mode-view="Year">
+                <?php echo t('Year'); ?>
             </li>
             <li>
                 <label id="hide-first-column-label"><input type="checkbox" value="<?= $firstColumnId ?>" id="hide-first-column">&nbsp;<?= t('Hide first Column') ?></label>
@@ -19,7 +22,7 @@
     </div>
     <?php if (!empty($tasks)) { ?>
         <div id="gantt-chart"
-             data-save-url="<?php echo $this->url->href('TaskGanttController', 'save', ['project_id' => $project['id'], 'plugin' => 'Gantt']); ?>"
+             data-save-url="<?php echo $this->url->href('TaskGanttController', 'save', ['project_id' => $project['id'], 'plugin' => 'Gantt']); ?>" 
              data-records='<?php echo json_encode($tasks); ?>'
         ></div>
         <div id="gantt-popup-template" class="hide">
