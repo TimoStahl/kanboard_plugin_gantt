@@ -50,6 +50,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $this->columns[$task['project_id']] = $this->columnModel->getList($task['project_id']);
         }
 
+        $need_date_calculation = ['start' => false, 'end' => false];
+
         // calculate some days
         // Start ❌ Duration ✔ End ❌
         if (!$task['date_started'] && $task['time_estimated'] && !$task['date_due']) {
@@ -67,9 +69,24 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $secondsToSub = $task['time_estimated'] * (60 * 60);
             $start = $end - $secondsToSub;
             // Start ❌ Duration ❌ End ❌
+        } else if (!$task['date_started'] && !$task['time_estimated'] && !$task['date_due']) {
+            $start = $task['date_started'] ?: time();
+            $end = $task['date_due'] ?: $start;
+            $need_date_calculation = ['start' => true, 'end' => true];
             // Start ✔ Duration ✔ End ✔
+        } else if ($task['date_started'] && $task['time_estimated'] && $task['date_due']) {
+            $start = $task['date_started'];
+            $secondsToAdd = $task['time_estimated'] * (60 * 60);
+            $end = ((($start + $secondsToAdd) > $task['date_due']) ? ($start + $secondsToAdd) : $task['date_started']);
             // Start ✔ Duration ❌ End ❌
+        } else if ($task['date_started'] && !$task['time_estimated'] && !$task['date_due']) {
+            $start = $task['date_started'];
+            $end = $task['date_started'];
+            $need_date_calculation = true;
             // Start ✔ Duration ❌ End ✔
+        } else if ($task['date_started'] && !$task['time_estimated'] && $task['date_due']) {
+            $start = $task['date_started'];
+            $end = $task['date_due'];
             // Start ❌ Duration ❌ End  ✔
         } else {
             $start = $task['date_started'] ?: time();
@@ -77,12 +94,33 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         }
         // TODO: use links to calculate dates, e.g. blocked
 
+        $link_settings = $this->linkModel->getAll();
+        $related_tasks = $this->taskLinkModel->getAllGroupedByLabel($task['id']);
+
+        // Duration ❌ && End ❌ && (Start ❌ || Start ✔) && task is blocked by other
+        // -> take min start date of others and set due date of current task
+        if ($need_date_calculation['end'] && isset($related_tasks['is blocked by'])) {
+            $end = $task['date_due'] = $this->_getMinValue($related_tasks['is blocked by'], 'date_started');
+            if ($need_date_calculation['start']) {
+                $start = $task['date_started'] = ((time() > $end) ? $end : time());
+            }
+            // Duration ❌ && End ❌ Start ❌ && task duplicates by other
+            // -> take min start date of others and set start date of current task
+            // -> take max due date of others and set due date of current task
+        } else if ($need_date_calculation['start'] && $need_date_calculation['end'] && isset($related_tasks['duplicates'])) {
+            $start = $task['date_start'] = $this->_getMinValue($related_tasks['duplicates'], 'date_started');
+            $end = $task['date_due'] = $this->_getMaxValue($related_tasks['duplicates'], 'date_end');
+            // Duration ❌ && End ❌ Start ❌ && task is a parent of others
+            // -> take min start date of others and set start date of current task
+            // -> take max due date of others and set due date of current task
+        } else if ($need_date_calculation['start'] && $need_date_calculation['end'] && isset($related_tasks['is a parent of'])) {
+            $start = $task['date_start'] = $this->_getMinValue($related_tasks['is a parent of'], 'date_started');
+            $end = $task['date_due'] = $this->_getMaxValue($related_tasks['is a parent of'], 'date_end');
+        }
+
         // Task connections
         $tasklinks = '';
-
-        $link_settings = $this->linkModel->getAll();
-
-        foreach ($this->taskLinkModel->getAllGroupedByLabel($task['id']) as $type => $links) {
+        foreach ($related_tasks as $type => $links) {
             $settings_key = array_search($type, array_column($link_settings, 'label'));
             $type_visible = $link_settings[$settings_key]['gantt_visible'];
 
@@ -124,5 +162,29 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
          */
 
         return $reference['templateTask'];
+    }
+
+    private function _getMinValue($array, $index)
+    {
+        $min = PHP_INT_MAX;
+        foreach ($array as $arr) {
+            if (isset($arr[$index]) && $arr[$index]) {
+                $min = ($min < $arr[$index]) ? $min : $arr[$index];
+            }
+        }
+
+        return (($min == PHP_INT_MAX) ? 0 : $min);
+    }
+
+    private function _getMaxValue($array, $index)
+    {
+        $max = 0;
+        foreach ($array as $arr) {
+            if (isset($arr[$index]) && $arr[$index]) {
+                $max = ($max > $arr[$index]) ? $max : $arr[$index];
+            }
+        }
+
+        return $max;
     }
 }
