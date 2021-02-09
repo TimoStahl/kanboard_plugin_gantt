@@ -97,12 +97,12 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         $link_settings = $this->linkModel->getAll();
         $related_tasks = $this->taskLinkModel->getAllGroupedByLabel($task['id']);
 
-        // Duration ❌ && End ❌ && (Start ❌ || Start ✔) && task is blocked by other
-        // -> take min start date of others and set due date of current task
-        if ($need_date_calculation['end'] && isset($related_tasks['is blocked by'])) {
-            $end = $task['date_due'] = $this->_getMinValue($related_tasks['is blocked by'], 'date_started');
-            if ($need_date_calculation['start']) {
-                $start = $task['date_started'] = ((time() > $end) ? $end : time());
+        // Duration ❌ && Start ❌ && (End ❌ || End ✔) && task is blocked by other
+        // -> take max due date of others and set start date of current task
+        if ($need_date_calculation['start'] && isset($related_tasks['is blocked by'])) {
+            $start = $task['date_start'] = $this->_getMaxValue($related_tasks['is blocked by'], 'date_due');
+            if ($need_date_calculation['end']) {
+                $end = $task['date_due'] = ((time() > $start) ? $start : time());
             }
             // Duration ❌ && End ❌ Start ❌ && task duplicates by other
             // -> take min start date of others and set start date of current task
@@ -117,6 +117,9 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $start = $task['date_start'] = $this->_getMinValue($related_tasks['is a parent of'], 'date_started');
             $end = $task['date_due'] = $this->_getMaxValue($related_tasks['is a parent of'], 'date_end');
         }
+        // todo : duplicates & start & !end
+        // todo : duplicates & !start & end
+        // todo : is child of
 
         // Task connections
         $tasklinks = '';
