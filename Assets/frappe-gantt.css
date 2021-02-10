@@ -1,188 +1,333 @@
 .gantt .grid-background {
-  fill: none;
+    fill: none;
 }
 
 .gantt .grid-header {
-  fill: #ffffff;
-  stroke: #e0e0e0;
-  stroke-width: 1.4;
+    fill: #ffffff;
+    stroke: #e0e0e0;
+    stroke-width: 1.4;
 }
 
 .gantt .grid-row {
-  fill: #ffffff;
+    fill: #ffffff;
 }
 
 .gantt .grid-row:nth-child(even) {
-  fill: #f5f5f5;
+    fill: #f5f5f5;
 }
 
 .gantt .row-line {
-  stroke: #ebeff2;
+    stroke: #ebeff2;
 }
 
 .gantt .tick {
-  stroke: #e0e0e0;
-  stroke-width: 0.2;
+    stroke: #e0e0e0;
+    stroke-width: 0.2;
 }
 
 .gantt .tick.thick {
-  stroke-width: 0.4;
+    stroke-width: 0.4;
 }
 
 .gantt .today-highlight {
-  fill: #fcf8e3;
-  opacity: 0.5;
+    fill: #fcf8e3;
+    opacity: 0.5;
 }
 
 .gantt .arrow {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.4;
+    fill: none;
+    stroke: #666;
+    stroke-width: 1.4;
 }
 
 .gantt .bar {
-  fill: #b8c2cc;
-  stroke: #8d99a6;
-  stroke-width: 0;
-  transition: stroke-width 0.3s ease;
-  user-select: none;
+    fill: #b8c2cc;
+    stroke: #8d99a6;
+    transition: stroke-width 0.3s ease;
+    user-select: none;
 }
 
 .gantt .bar-progress {
-  fill: #a3a3ff;
+    fill: #a3a3ff;
 }
 
 .gantt .bar-invalid {
-  fill: transparent;
-  stroke: #8d99a6;
-  stroke-width: 1;
-  stroke-dasharray: 5;
+    fill: transparent;
+    stroke: #8d99a6;
+    stroke-width: 1;
+    stroke-dasharray: 5;
 }
 
 .gantt .bar-invalid ~ .bar-label {
-  fill: #555;
+    fill: #555;
 }
 
 .gantt .bar-label {
-  fill: #fff;
-  dominant-baseline: central;
-  text-anchor: middle;
-  font-size: 12px;
-  font-weight: lighter;
+    fill: #000;
+    dominant-baseline: central;
+    text-anchor: middle;
+    font-size: 12px;
+    font-weight: lighter;
 }
 
 .gantt .bar-label.big {
-  fill: #555;
-  text-anchor: start;
+    fill: #555;
+    text-anchor: start;
 }
 
 .gantt .handle {
-  fill: #ddd;
-  cursor: ew-resize;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease;
+    fill: #ddd;
+    cursor: ew-resize;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
 }
 
 .gantt .bar-wrapper {
-  cursor: pointer;
-  outline: none;
+    cursor: pointer;
+    outline: none;
 }
 
 .gantt .bar-wrapper:hover .bar {
-  fill: #a9b5c1;
+    fill: #a9b5c1;
 }
 
 .gantt .bar-wrapper:hover .bar-progress {
-  fill: #8a8aff;
+    fill: #8a8aff;
 }
 
 .gantt .bar-wrapper:hover .handle {
-  visibility: visible;
-  opacity: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
 .gantt .bar-wrapper.active .bar {
-  fill: #a9b5c1;
+    fill: #a9b5c1;
 }
 
 .gantt .bar-wrapper.active .bar-progress {
-  fill: #8a8aff;
+    fill: #8a8aff;
 }
 
 .gantt .lower-text,
 .gantt .upper-text {
-  font-size: 12px;
-  text-anchor: middle;
+    font-size: 12px;
+    text-anchor: middle;
 }
 
 .gantt .upper-text {
-  fill: #555;
+    fill: #555;
 }
 
 .gantt .lower-text {
-  fill: #333;
+    fill: #333;
 }
 
 .gantt .hide {
-  display: none;
+    display: none;
 }
 
 .gantt-container {
-  position: relative;
-  overflow: auto;
-  font-size: 12px;
+    position: relative;
+    overflow: auto;
+    font-size: 12px;
 }
 
 .gantt-container .popup-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 0;
-  color: #959da5;
-  border-radius: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0;
+    color: #959da5;
+    border-radius: 3px;
+    min-width: 180px;
 }
 
 .gantt-container .popup-wrapper .title {
-  border-bottom: 3px solid #a3a3ff;
-  padding: 10px;
+    border-bottom: 3px solid #a3a3ff;
+    padding: 10px;
 }
 
 .gantt-container .popup-wrapper .subtitle {
-  padding: 10px;
-  color: #dfe2e5;
+    padding: 10px;
+    color: #dfe2e5;
 }
 
 .gantt-container .popup-wrapper .pointer {
-  position: absolute;
-  height: 5px;
-  margin: 0 0 0 -5px;
-  border: 5px solid transparent;
-  border-top-color: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    height: 5px;
+    margin: 0 0 0 -5px;
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.8);
 }
 
 /* custom kanboard addition */
 .details-container {
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }
 .details-container table td {
-  border: none;
+    border: none;
 }
 .details-container a {
-  text-decoration: none;
-  color: white;
+    text-decoration: none;
+    color: white;
 }
 .details-container a:hover {
-  text-decoration: none;
-  color: white;
+    text-decoration: none;
+    color: white;
 }
 .details-container table {
-  margin: 0;
+    margin: 0;
 }
 .gantt > .active {
-  background-color: lightgrey;
+    background-color: lightgrey;
+}
+
+#hide-first-column-label {
+    display: inline;
+}
+
+.hide {
+    display: none;
+}
+
+/* Task colors */
+.gantt .bar-color-white {
+    fill: white;
+    stroke: #aaa8a8;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-white {
+    fill: rgb(170, 168, 168);
+}
+
+.gantt .bar-color-yellow {
+    fill: rgb(245, 247, 196);
+    stroke: rgb(223, 227, 45);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-yellow {
+    fill: rgb(224, 228, 124);
+}
+
+.gantt .bar-color-blue {
+    fill: rgb(219, 235, 255);
+    stroke: rgb(168, 207, 255);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-blue {
+    fill: rgb(173, 207, 250);
+}
+
+.gantt .bar-color-green {
+    fill: rgb(189, 244, 203);
+    stroke: rgb(74, 227, 113);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-green {
+    fill: rgb(125, 247, 155);
+}
+
+.gantt .bar-color-purple {
+    fill: rgb(223, 176, 255);
+    stroke: rgb(205, 133, 254);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-purple {
+    fill: rgb(198, 137, 238);
+}
+
+.gantt .bar-color-red {
+    fill: rgb(255, 187, 187);
+    stroke: rgb(255, 151, 151);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-red {
+    fill: rgb(243, 137, 137);
+}
+
+.gantt .bar-color-orange {
+    fill: rgb(255, 215, 179);
+    stroke: rgb(255, 172, 98);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-orange {
+    fill: rgb(248, 179, 118);
+}
+
+.gantt .bar-color-grey {
+    fill: rgb(238, 238, 238);
+    stroke: rgb(204, 204, 204);
+}
+.gantt .bar-wrapper:hover .bar.bar-color-grey {
+    fill: rgb(214, 200, 200);
+}
+
+.gantt .bar-color-brown {
+    fill: #d7ccc8;
+    stroke: #4e342e;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-brown {
+    fill: #c2a398;
+}
+
+.gantt .bar-color-deep_orange {
+    fill: #ffab91;
+    stroke: #e64a19;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-deep_orange {
+    fill: #da886f;
+}
+
+.gantt .bar-color-dark_grey {
+    fill: #cfd8dc;
+    stroke: #455a64;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-dark_grey {
+    fill: #a4a9ac;
+}
+
+.gantt .bar-color-pink {
+    fill: #f48fb1;
+    stroke: #d81b60;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-pink {
+    fill: #d67f9c;
+}
+
+.gantt .bar-color-teal {
+    fill: #80cbc4;
+    stroke: #00695c;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-teal {
+    fill: #67b6ae;
+}
+
+.gantt .bar-color-cyan {
+    fill: #b2ebf2;
+    stroke: #00bcd4;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-cyan {
+    fill: #89c9d1;
+}
+
+.gantt .bar-color-lime {
+    fill: #e6ee9c;
+    stroke: #afb42b;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-lime {
+    fill: #ced877;
+}
+
+.gantt .bar-color-light_green {
+    fill: #dcedc8;
+    stroke: #689f38;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-light_green {
+    fill: #b9da94;
+}
+
+.gantt .bar-color-amber {
+    fill: #ffe082;
+    stroke: #ffa000;
+}
+.gantt .bar-wrapper:hover .bar.bar-color-amber {
+    fill: #cfb462;
 }
