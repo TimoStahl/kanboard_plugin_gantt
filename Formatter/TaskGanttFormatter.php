@@ -54,7 +54,6 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
 
         $need_date_calculation = ["start" => false, "end" => false];
 
-        $task["__LINES__"] = [];
         $this->_calculateDatesAndTime($task, $need_date_calculation);
         // TODO: use links to calculate dates, e.g. blocked
 
@@ -71,29 +70,13 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $need_date_calculation["start"] &&
             isset($related_tasks["is blocked by"])
         ) {
-            $task["calculated_start"] = $task["date_start"] = $this->_getMaxValue(
+            $task["date_started"] = $this->_getMaxValue(
                 $related_tasks["is blocked by"],
                 "date_due"
             );
             if ($need_date_calculation["end"]) {
-                $task["calculated_end"] = $task["date_due"] = time() > $task["calculated_start"] ? $task["calculated_start"] : time();
+                $task["date_due"] = time() > $task["date_started"] ? $task["date_started"] : time();
             }
-            // Duration ❌ && End ❌ Start ❌ && task duplicates by other
-            // -> take min start date of others and set start date of current task
-            // -> take max due date of others and set due date of current task
-        } elseif (
-            $need_date_calculation["start"] &&
-            $need_date_calculation["end"] &&
-            isset($related_tasks["duplicates"])
-        ) {
-            $task["calculated_start"] = $task["date_start"] = $this->_getMinValue(
-                $related_tasks["duplicates"],
-                "date_started"
-            );
-            $task["calculated_end"] = $task["date_due"] = $this->_getMaxValue(
-                $related_tasks["duplicates"],
-                "date_end"
-            );
             // Duration ❌ && End ❌ Start ❌ && task is a parent of others
             // -> take min start date of others and set start date of current task
             // -> take max due date of others and set due date of current task
@@ -102,50 +85,35 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $need_date_calculation["end"] &&
             isset($related_tasks["is a parent of"])
         ) {
-            $task["calculated_start"] = $task["date_start"] = $this->_getMinValue(
+            $task["date_started"] = $this->_getMinValue(
                 $related_tasks["is a parent of"],
                 "date_started"
             );
-            $task["calculated_end"] = $task["date_due"] = $this->_getMaxValue(
+            $task["date_due"] = $this->_getMaxValue(
                 $related_tasks["is a parent of"],
                 "date_end"
             );
-        }
+            // Duplicates ✔ && (End ❌ || End ✔) && (Start ❌ || Start ✔)
+        } elseif (
+            isset($related_tasks["duplicates"])
+        ) {
+            // Duplicates ✔ && Start ❌
+            // -> take min start date of others and set start date of current task
+            if ($need_date_calculation["start"]) {
+                $task["date_started"] = $this->_getMinValue(
+                    $this->_calculateRelatedTasks($related_tasks["duplicates"]),
+                    "date_started"
+                );
+            }
 
-        // duplicates & !start & !end
-        if (
-            !$task["date_started"] &&
-            !$task["date_due"] &&
-            isset($related_tasks["duplicates"])
-        ) {
-            $task["calculated_start"] = $task["date_start"] = $this->_getMinValue(
-                $this->_calculateRelatedTasks($related_tasks["duplicates"]),
-                "date_started"
-            );
-            $task["calculated_end"] = $task["date_due"] = $this->_getMaxValue(
-                $this->_calculateRelatedTasks($related_tasks["duplicates"]),
-                "date_end"
-            );
-            // duplicates & !start & end
-        } elseif (
-            !$task["date_started"] &&
-            $task["date_due"] &&
-            isset($related_tasks["duplicates"])
-        ) {
-            $task["calculated_start"] = $task["date_start"] = $this->_getMinValue(
-                $this->_calculateRelatedTasks($related_tasks["duplicates"]),
-                "date_started"
-            );
-            // duplicates & start & !end
-        } elseif (
-            $task["date_started"] &&
-            !$task["date_due"] &&
-            isset($related_tasks["duplicates"])
-        ) {
-            $task["calculated_end"] = $task["date_due"] = $this->_getMaxValue(
-                $this->_calculateRelatedTasks($related_tasks["duplicates"]),
-                "date_end"
-            );
+            // Duplicates ✔ && End ❌
+            // -> take max due date of others and set due date of current task
+            if ($need_date_calculation["end"]) {
+                $task["date_due"] = $this->_getMaxValue(
+                    $this->_calculateRelatedTasks($related_tasks["duplicates"]),
+                    "date_end"
+                );
+            }
         }
         // todo : is child of
 
@@ -168,8 +136,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         $templateTask = [
             "id" => $task["id"],
             "name" => $task["title"],
-            "start" => date("Y-m-d", $task["calculated_start"]),
-            "end" => date("Y-m-d", $task["calculated_end"]),
+            "start" => date("Y-m-d", $task["date_started"]),
+            "end" => date("Y-m-d", $task["date_due"]),
             "progress" => $this->taskModel->getProgress(
                 $task,
                 $this->columns[$task["project_id"]]
@@ -187,7 +155,6 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             "category" => $task["category_name"],
             "custom_class" => "bar-color-" . $task["color_id"],
             "column_id" => $task["column_id"],
-            "__LINES__" => $task["__LINE__"],
         ];
 
         // we have to create an array because hook::reference allow only 1 argument
@@ -229,9 +196,9 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             !$task["date_due"]
         ) {
             $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = time();
+            $task["date_started"] = time();
             $secondsToAdd = $task["time_estimated"] * (60 * 60);
-            $task["calculated_end"] = $task["calculated_start"] + $secondsToAdd;
+            $task["date_due"] = $task["date_started"] + $secondsToAdd;
             // Start ✔ Duration ✔ End ❌
         } elseif (
             $task["date_started"] &&
@@ -239,9 +206,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             !$task["date_due"]
         ) {
             $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"];
             $secondsToAdd = $task["time_estimated"] * (60 * 60);
-            $task["calculated_end"] = $task["calculated_start"] + $secondsToAdd;
+            $task["date_due"] = $task["date_started"] + $secondsToAdd;
             // Start ❌ Duration ✔ End  ✔
         } elseif (
             !$task["date_started"] &&
@@ -249,9 +215,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $task["date_due"]
         ) {
             $task["__LINE__"][] = __LINE__;
-            $task["calculated_end"] = $task["date_due"];
             $secondsToSub = $task["time_estimated"] * (60 * 60);
-            $task["calculated_start"] = $task["calculated_end"] - $secondsToSub;
+            $task["date_started"] = $task["date_due"] - $secondsToSub;
             // Start ❌ Duration ❌ End ❌
         } elseif (
             !$task["date_started"] &&
@@ -259,8 +224,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             !$task["date_due"]
         ) {
             $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"] ?: time();
-            $task["calculated_end"] = $task["date_due"] ?: $task["calculated_start"];
+            $task["date_started"] = $task["date_started"] ?: time();
+            $task["date_due"] = $task["date_due"] ?: $task["date_started"];
             $need_date_calculation = ["start" => true, "end" => true];
             // Start ✔ Duration ✔ End ✔
         } elseif (
@@ -269,36 +234,30 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $task["date_due"]
         ) {
             $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"];
             $secondsToAdd = $task["time_estimated"] * (60 * 60);
-            $task["calculated_end"] =
-                $task["calculated_start"] + $secondsToAdd > $task["date_due"]
-                ? $task["calculated_start"] + $secondsToAdd
-                : $task["calculated_start"]["date_started"];
+            $task["date_due"] =
+                $task["date_started"] + $secondsToAdd > $task["date_due"]
+                ? $task["date_started"] + $secondsToAdd
+                : $task["date_started"];
             // Start ✔ Duration ❌ End ❌
         } elseif (
             $task["date_started"] &&
             !$task["time_estimated"] &&
             !$task["date_due"]
         ) {
-            $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"];
-            $task["calculated_end"] = $task["date_started"];
-            //$need_date_calculation = true;
+            $task["date_due"] = $task["date_started"];
+            $need_date_calculation = ["start" => false, "end" => true];
             // Start ✔ Duration ❌ End ✔
         } elseif (
             $task["date_started"] &&
             !$task["time_estimated"] &&
             $task["date_due"]
         ) {
-            $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"];
-            $task["calculated_end"] = $task["date_due"];
+            // nothing to do here :)
             // Start ❌ Duration ❌ End  ✔
         } else {
-            $task["__LINE__"][] = __LINE__;
-            $task["calculated_start"] = $task["date_started"] ?: time();
-            $task["calculated_end"] = $task["date_due"] ?: $task["calculated_start"];
+            $task["date_started"] = $task["date_started"] ?: time();
+            $task["date_due"] = $task["date_due"] ?: $task["date_started"];
         }
     }
 
