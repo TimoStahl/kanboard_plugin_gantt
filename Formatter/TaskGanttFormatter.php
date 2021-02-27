@@ -75,7 +75,10 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
                 "date_due"
             );
             if ($need_date_calculation["end"]) {
-                $task["date_due"] = time() > $task["date_started"] ? $task["date_started"] : time();
+                $task["date_due"] =
+                    time() > $task["date_started"]
+                        ? $task["date_started"]
+                        : time();
             }
             // Duration ❌ && End ❌ Start ❌ && task is a parent of others
             // -> take min start date of others and set start date of current task
@@ -94,9 +97,7 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
                 "date_end"
             );
             // Duplicates ✔ && (End ❌ || End ✔) && (Start ❌ || Start ✔)
-        } elseif (
-            isset($related_tasks["duplicates"])
-        ) {
+        } elseif (isset($related_tasks["duplicates"])) {
             // Duplicates ✔ && Start ❌
             // -> take min start date of others and set start date of current task
             if ($need_date_calculation["start"]) {
@@ -175,6 +176,12 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         return $reference["templateTask"];
     }
 
+    /**
+     * _calculateRelatedTasks
+     *
+     * @param  mixed $tasks List of tasks that need dates calculation
+     * @return array Tasks with date calculated
+     */
     private function _calculateRelatedTasks($tasks)
     {
         $arr = [];
@@ -186,6 +193,13 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         return $tasks;
     }
 
+    /**
+     * _calculateDatesAndTime
+     *
+     * @param  mixed $task Task to calculate date_stared and date_due
+     * @param  mixed $need_date_calculation Array to know with date will be calculated with related tasks
+     * @return void
+     */
     private function _calculateDatesAndTime(&$task, &$need_date_calculation)
     {
         // calculate some days
@@ -237,8 +251,8 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
             $secondsToAdd = $task["time_estimated"] * (60 * 60);
             $task["date_due"] =
                 $task["date_started"] + $secondsToAdd > $task["date_due"]
-                ? $task["date_started"] + $secondsToAdd
-                : $task["date_started"];
+                    ? $task["date_started"] + $secondsToAdd
+                    : $task["date_started"];
             // Start ✔ Duration ❌ End ❌
         } elseif (
             $task["date_started"] &&
@@ -261,6 +275,13 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         }
     }
 
+    /**
+     * _getMinValue
+     *
+     * @param  mixed $array Array that will be read to get minValue at index $index
+     * @param  mixed $index Index to seek min value
+     * @return void
+     */
     private function _getMinValue($array, $index)
     {
         $min = PHP_INT_MAX;
@@ -273,6 +294,13 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
         return $min == PHP_INT_MAX ? 0 : $min;
     }
 
+    /**
+     * _getMaxValue
+     *
+     * @param  mixed $array Array that will be read to get maxValue at index $index
+     * @param  mixed $index Index to seek max value
+     * @return void
+     */
     private function _getMaxValue($array, $index)
     {
         $max = 0;
